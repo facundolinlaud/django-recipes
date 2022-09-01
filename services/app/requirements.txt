@@ -3,6 +3,7 @@ django-debug-toolbar==2.0   # A configurable set of panels that display various 
 psycopg2==2.8.3             # Python-PostgreSQL Database Adapter
 uwsgi==2.0.18               # The uWSGI Server
 Jinja2==2.10.1              # A small but fast and easy to use stand-alone template engine written in pure python.
-
+djangorestframework>=3.12.4,<3.13
 # Linting
 pylint==2.3.1               # python code static checker
+# drf-writable-nested==0.7.0
