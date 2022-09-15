@@ -20,13 +20,13 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def _get_or_create_ingredients(self, ingredients, recipe):
         for ingredient in ingredients:
-            ingredient_obj, created = Ingredient.objects.get_or_create(**ingredient)
+            ingredient_obj, created = Ingredient.objects.get_or_create(**ingredient, recipe=recipe)
             recipe.ingredients.add(ingredient_obj)
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients', [])
         recipe = Recipe.objects.create(**validated_data)
-        self._get_or_create_ingredients(ingredients, recipe)
+        self._get_or_create_ingredients(ingredients, recipe=recipe)
 
         return recipe
 
