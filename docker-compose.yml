@@ -1,51 +1,54 @@
 version: '3'
 
 services:
-  # PostgreSQL
   postgres:
-      image: postgres:11.4
-      hostname: postgres
-      ports:
-        - 5432:5432 # Bind host port 5432 to PostgreSQL port 5432
-      volumes:
-        - ./pgdata:/var/lib/postgresql/data
-      environment:
-        - LC_ALL=C.UTF-8
-        - POSTGRES_USER=docker
-        - POSTGRES_PASSWORD=docker
+    image: postgres:13-alpine
+    volumes:
+      - dev-db-data:/var/lib/postgresql/data
+    hostname: postgres
+    ports:
+      - 5432:5432 # Bind host port 5432 to PostgreSQL port 5432
+    environment:
+      - LC_ALL=C.UTF-8
+      - POSTGRES_DB=recipes
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
 
   # Django app
   app:
-      build:
-        context: .
-      command: dev
-      #command: uwsgi
-      ports:
-        - 8000:8000
-        - 8001:8001
-      volumes:
-        - ./app:/usr/src/app
-      depends_on:
-        - postgres
-      links:
-        - postgres:postgres
-      environment:
-        - DEBUG=True
-        - PORT=8000
-        - POSTGRES_DB_NAME=recipes
-        - POSTGRES_PORT_5432_TCP_ADDR=postgres
-        - POSTGRES_PORT_5432_TCP_PORT=5432
-        - POSTGRES_USER=docker
-        - POSTGRES_PASSWORD=docker
-        - PGPASSWORD=docker # this is needed to autofill the password field for creating the db
-        - SECRET_KEY=JeffreyLebowski # obviously this wouldn't be pushed to the repo if this wasn't an on boarding project
-        - WSGI_MODULE=recipes.wsgi:application
+    build:
+      context: .
+    command: dev
+    #command: uwsgi
+    ports:
+      - 8000:8000
+      - 8001:8001
+    volumes:
+      - ./app:/usr/src/app
+    depends_on:
+      - postgres
+    links:
+      - postgres:postgres
+    environment:
+      - DEBUG=True
+      - PORT=8000
+      - POSTGRES_DB_NAME=recipes
+      - POSTGRES_PORT_5432_TCP_ADDR=postgres
+      - POSTGRES_PORT_5432_TCP_PORT=5432
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - PGPASSWORD=docker # this is needed to autofill the password field for creating the db
+      - SECRET_KEY=JeffreyLebowski # secret value wouldn't be pushed to the repo if this wasn't an on boarding project
+      - WSGI_MODULE=recipes.wsgi:application
 
   web:
-      build:
-        context: ./
-        dockerfile: ./services/nginx/Dockerfile
-      ports:
-        - 80:80
-      depends_on:
-        - app
+    build:
+      context: ./
+      dockerfile: ./services/nginx/Dockerfile
+    ports:
+      - 80:80
+    depends_on:
+      - app
+  
+volumes:
+  dev-db-data:
